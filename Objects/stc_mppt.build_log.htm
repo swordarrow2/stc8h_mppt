@@ -1,0 +1,48 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.27.1.0
+Copyright (C) 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: JF S, p, LIC=VG6CK-ZN744-WQ70S-LRA6N-7VGYV-AG11S
+ 
+Tool Versions:
+Toolchain:       PK51 Prof. Developers Kit  Version: 9.60.0.0
+Toolchain Path:  C:\Keil_v5\C51\BIN
+C Compiler:      C51.exe V9.60.0.0
+Assembler:       A51.exe V8.2.7.0
+Linker/Locator:  BL51.exe V6.22.2.0
+Library Manager: LIB51.exe V4.30.1.0
+Hex Converter:   OH51.exe V2.7.0.0
+CPU DLL:         S8051.DLL V3.122.0.0
+Dialog DLL:      DP51.DLL V2.67.0.0 
+<h2>Project:</h2>
+D:\develop\51mcu\stc_mppt\stc_mppt.uvproj
+Project File Date:  12/06/2025
+
+<h2>Output:</h2>
+Build target 'stc_mppt'
+compiling main.c...
+Sources\main.c(40): warning C206: 'CH224_Init': missing function-prototype
+Sources\main.c(54): warning C206: 'CH224_ReadStatus': missing function-prototype
+Sources\main.c(56): warning C206: 'CH224_SetVoltage': missing function-prototype
+Sources\main.c(56): error C267: 'CH224_SetVoltage': requires ANSI-style prototype
+compiling pd.c...
+Sources\device\pd.c(27): error C202: 'vcc': undefined identifier
+compiling ssd1306.c...
+Sources\driver\ssd1306.c(15): warning C206: 'I2C_MasterStart': missing function-prototype
+Sources\driver\ssd1306.c(16): warning C206: 'I2C_MasterSendByte': missing function-prototype
+Sources\driver\ssd1306.c(16): error C267: 'I2C_MasterSendByte': requires ANSI-style prototype
+compiling ch224.c...
+Sources\driver\ch224.c(149): error C202: 'voltage_v': undefined identifier
+compiling i2c.c...
+Sources\driver\i2c.c(62): warning C206: 'i2c_start': missing function-prototype
+Sources\driver\i2c.c(73): warning C206: 'i2c_stop': missing function-prototype
+Sources\driver\i2c.c(85): warning C206: 'i2c_write_data': missing function-prototype
+Sources\driver\i2c.c(85): error C267: 'i2c_write_data': requires ANSI-style prototype
+Target not created.
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
