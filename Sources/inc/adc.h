@@ -17,10 +17,11 @@
 
 
 void ADC_Init(void);
+
 uint16_t ADC_Convert(uint8_t ch);
 
 extern int *BGV;                                       //内部1.19V参考信号源值存放在idata中
-
+extern unsigned char vcc;
 
 //<<AICUBE_USER_EXTERNAL_DECLARE_BEGIN>>
 // 在此添加用户外部函数和外部变量声明  

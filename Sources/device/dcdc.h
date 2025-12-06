@@ -7,24 +7,38 @@
 
 #include "../inc/eg2104.h"
 
-void dcdc_update(void);
+// 工作模式枚举
+typedef enum {
+    DCDC_MODE_NORMAL = 0,    // 普通电源模式
+    DCDC_MODE_PD,            // PD模式
+    DCDC_MODE_MPPT           // MPPT模式
+} DCDC_Mode_t;
 
-void dcdc_init();
+void DCDC_Update(void);
 
-void dcdc_enable(void);
+void DCDC_Init(void);
 
-void dcdc_disable(void);
+void DCDC_Enable(void);
 
-uint16_t dcdc_get_input_u(void);
+void DCDC_Disable(void);
 
-uint16_t dcdc_get_input_i(void);
+uint16_t DCDC_GetInputVoltage(void);
 
-void dcdc_inc_duty(void);
+uint16_t DCDC_GetInputCurrent(void);
 
-void dcdc_dec_duty(void);
+void DCDC_IncDuty(void);
 
-float dcdc_get_duty(void);
+void DCDC_DecDuty(void);
 
-void dcdc_set_duty(float value);
+float DCDC_GetDuty(void);
+
+void DCDC_SetDuty(float value);
+
+void DCDC_SetMode(DCDC_Mode_t mode);
+
+DCDC_Mode_t DCDC_GetMode(void);
+
+const char *DCDC_GetModeString(void);
+
 
 #endif //STC_MPPT_DCDC_H

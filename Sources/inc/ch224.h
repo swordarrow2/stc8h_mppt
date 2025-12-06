@@ -59,7 +59,7 @@ uint8_t CH224_ReadStatus(void);
 
 BOOL CH224_SetVoltage(CH224_Voltage_t voltage);
 
-uint8_t CH224_ReadMaxCurrent(uint16_t *current_ma);
+uint16_t CH224_ReadMaxCurrent(void);
 
 uint8_t CH224_ReadRegister(uint8_t reg_addr);
 

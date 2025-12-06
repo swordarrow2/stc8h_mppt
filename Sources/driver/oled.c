@@ -33,13 +33,6 @@ static void init_regions(void) {
         regions[i].width = region_width - (2 * REGION_BORDER_WIDTH);
         regions[i].height = region_height - (2 * REGION_BORDER_WIDTH);
     }
-
-    // 设置默认标签（位置保持不变）
-    OLED_UI_SetRegionLabel(REGION_TOP_LEFT, "PD");
-    OLED_UI_SetRegionLabel(REGION_TOP_RIGHT, "Solar");
-    OLED_UI_SetRegionLabel(REGION_BOTTOM_LEFT, "USB");
-    OLED_UI_SetRegionLabel(REGION_BOTTOM_RIGHT, "Bat");
-    OLED_UI_SetRegionLabel(REGION_MIDDLE_CENTER, "Power");
 }
 
 // 计算文本居中位置

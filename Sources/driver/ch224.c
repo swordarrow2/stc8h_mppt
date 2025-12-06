@@ -28,16 +28,10 @@ BOOL CH224_SetVoltage(CH224_Voltage_t voltage) {
 // 函数返回: 0-成功，1-失败
 // 说明: 电流值 = 寄存器值 × 50mA
 ////////////////////////////////////////
-uint8_t CH224_ReadMaxCurrent(uint16_t *current_ma) {
-    uint8_t reg_value;
-
+uint16_t CH224_ReadMaxCurrent() {
+    uint8_t reg_value;  // 单位: 50mA
     reg_value = CH224_ReadRegister(CH224_REG_CURRENT);
-    if (reg_value == 0xFF) {  // 读取失败
-        return 1;
-    }
-
-    *current_ma = (uint16_t) reg_value * 50;  // 单位: 50mA
-    return 0;
+    return (uint16_t) reg_value * 50;
 }
 
 ////////////////////////////////////////

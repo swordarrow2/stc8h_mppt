@@ -11,7 +11,8 @@
 
 
 #include "config.h"                     //默认已包含stdio.h、intrins.h等头文件
-
+#include "./device/screen.h"
+#include "./device/logic.h"
 
 //<<AICUBE_USER_INCLUDE_BEGIN>>
 // 在此添加用户头文件包含  
@@ -28,52 +29,40 @@
 // 函数返回: 无
 ////////////////////////////////////////
 void main(void) {
-    uint8_t status;
-    uint16_t current_ma;
-    uint8_t ret;
-    CH224_PPS_Result_t result;
-    char str_buffer[12];
-    uint8_t pos = 20;
+//    uint8_t status;
+//    uint16_t current_ma;
+//    uint8_t ret;
+//    char str_buffer[12];
 
     SYS_Init();
 
-    CH224_Init();
     // 显示内容
-    OLED_UI_Init();
-    // 设置各个区域的内容
-    OLED_UI_SetRegionValue(REGION_TOP_LEFT, "12.1V");
+    SCREEN_Init();
 
-    OLED_UI_SetRegionValue(REGION_TOP_RIGHT, "1.2A");
-
-    OLED_UI_SetRegionValue(REGION_BOTTOM_LEFT, "5V");
-
-    OLED_UI_SetRegionValue(REGION_BOTTOM_RIGHT, "3.7V");
-
-    OLED_UI_SetRegionValue(REGION_MIDDLE_CENTER, "13W");
-
-    status = CH224_ReadStatus();// 检查PD协议是否激活
-    if (status & CH224_STATUS_PD_ACTIVE) {
-        ret = CH224_SetVoltage(CH224_VOLTAGE_9V);
-        if (ret == 0) {
-            // 可以读取当前最大电流
-            ret = CH224_ReadCurrentValue(&current_ma);
-            if (ret == 0) {
-                // current_ma 现在包含最大电流值(单位: mA)
-                OLED_PutNumber(42, 10, current_ma);
-            }
-        }
-    }
-    result = CH224_EnablePPS(7700);
+//    status = CH224_ReadStatus();// 检查PD协议是否激活
+//    if (status & CH224_STATUS_PD_ACTIVE) {
+//        ret = CH224_SetVoltage(CH224_VOLTAGE_9V);
+//        if (ret == 0) {
+//            // 可以读取当前最大电流
+//            ret = CH224_ReadCurrentValue(&current_ma);
+//            if (ret == 0) {
+//                // current_ma 现在包含最大电流值(单位: mA)
+//                OLED_PutNumber(42, 10, current_ma);
+//            }
+//        }
+//    }
+//    result = CH224_EnablePPS(7700);
     while (1) {
-        CH224_ReadCurrentValue(&current_ma);  // 可以读取当前最大电流
+        SCREEN_Update();
+//        current_ma = PD_GetMaxAvailableCurrent();  // 可以读取当前最大电流
+//
+//        OLED_UI_SetRegionLabel(REGION_TOP_LEFT, PD_GetProtocolType());
+//
+//        sprintf(str_buffer, "%d", current_ma);
 
-        OLED_UI_SetRegionLabel(REGION_TOP_LEFT, CH224_GetProtocolType());
-
-        sprintf(str_buffer, "%d", current_ma);
-
-        OLED_UI_SetRegionValue(REGION_MIDDLE_LEFT, str_buffer);
-        OLED_UI_SetRegionLabel(REGION_MIDDLE_LEFT, "PD MAX");
-        OLED_UI_UpdateDisplay();
+//        OLED_UI_SetRegionValue(REGION_MIDDLE_LEFT, str_buffer);
+//        OLED_UI_SetRegionLabel(REGION_MIDDLE_LEFT, "PD MAX");
+//        OLED_UI_UpdateDisplay();
         //<<AICUBE_USER_MAIN_LOOP_BEGIN>>
         // 在此添加主函数中用户主循环代码  
         //<<AICUBE_USER_MAIN_LOOP_END>>

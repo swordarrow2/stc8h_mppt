@@ -12,20 +12,20 @@
 #define PD_CTRL P23
 
 // º¯ÊýÉùÃ÷
-uint8_t pd_init(void);
+uint8_t PD_Init(void);
 
-void pd_enable_input(void);
+void PD_EnableInput(void);
 
-void pd_disable_input(void);
+void PD_DisableInput(void);
 
-uint16_t pd_get_actual_voltage(void);
+uint16_t PD_GetActualVoltage(void);
 
-uint16_t pd_get_request_voltage_mv(void);
+uint16_t PD_GetRequestVoltage(void);
 
-void pd_set_request_voltage_mv(uint16_t mv);
+void PD_SetRequestVoltage(uint16_t mv);
 
-uint16_t pd_get_max_available_current(void);
+uint16_t PD_GetMaxAvailableCurrent(void);
 
-const char *pd_get_protocol_type(void);
+const char *PD_GetProtocolType(void);
 
 #endif //STC_MPPT_PD_H

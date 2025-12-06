@@ -23,26 +23,12 @@ Project File Date:  12/06/2025
 
 <h2>Output:</h2>
 Build target 'stc_mppt'
-compiling main.c...
-Sources\main.c(40): warning C206: 'CH224_Init': missing function-prototype
-Sources\main.c(54): warning C206: 'CH224_ReadStatus': missing function-prototype
-Sources\main.c(56): warning C206: 'CH224_SetVoltage': missing function-prototype
-Sources\main.c(56): error C267: 'CH224_SetVoltage': requires ANSI-style prototype
-compiling pd.c...
-Sources\device\pd.c(27): error C202: 'vcc': undefined identifier
-compiling ssd1306.c...
-Sources\driver\ssd1306.c(15): warning C206: 'I2C_MasterStart': missing function-prototype
-Sources\driver\ssd1306.c(16): warning C206: 'I2C_MasterSendByte': missing function-prototype
-Sources\driver\ssd1306.c(16): error C267: 'I2C_MasterSendByte': requires ANSI-style prototype
-compiling ch224.c...
-Sources\driver\ch224.c(149): error C202: 'voltage_v': undefined identifier
-compiling i2c.c...
-Sources\driver\i2c.c(62): warning C206: 'i2c_start': missing function-prototype
-Sources\driver\i2c.c(73): warning C206: 'i2c_stop': missing function-prototype
-Sources\driver\i2c.c(85): warning C206: 'i2c_write_data': missing function-prototype
-Sources\driver\i2c.c(85): error C267: 'i2c_write_data': requires ANSI-style prototype
-Target not created.
-Build Time Elapsed:  00:00:01
+compiling dcdc.c...
+linking...
+Program Size: data=15.6 xdata=1771 code=18163
+creating hex file from ".\Objects\stc_mppt"...
+".\Objects\stc_mppt" - 0 Error(s), 0 Warning(s).
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>

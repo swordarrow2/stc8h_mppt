@@ -3,51 +3,57 @@
 //
 
 #include "pd.h"
+#include "ch224.h"
 
-#define ADC_CHANNEL_PD_INPUT_U 6
+#define ADC_CHANNEL_PD_IN_VOLTAGE 6
 
 #define PD_CTRL P23
 
-static uint16_t request_voltage_mv = 5000;
+static uint16_t request_voltage = 5000; //mV
 
-uint8_t pd_init(void) {
-    ch224_init();
-    return ch224_check_connection();
+uint8_t PD_Init(void) {
+    CH224_Init();
+    return CH224_CheckConnection();
 }
 
-void pd_enable_input(void) {
+void PD_EnableInput(void) {
     PD_CTRL = 1;
 }
 
-void pd_disable_input(void) {
+void PD_DisableInput(void) {
     PD_CTRL = 0;
 }
 
-uint16_t pd_get_actual_voltage(void) { //mV
-    return (uint16_t) (vcc / 4095.0 * adc_read(ADC_CHANNEL_PD_INPUT_U) * 11);
+uint16_t PD_GetActualVoltage(void) { //mV
+    return (uint16_t) (vcc / 4095.0 * ADC_Convert(ADC_CHANNEL_PD_IN_VOLTAGE) * 11);
 }
 
-uint16_t pd_get_request_voltage_mv(void) {
-    return request_voltage_mv;
+uint16_t PD_GetRequestVoltage(void) {
+    return request_voltage;
 }
 
-void pd_set_request_voltage_mv(uint16_t mv) {
+void PD_SetRequestVoltage(uint16_t mv) {
     uint8_t result = 1;
-    result = ch224_request_voltage(mv);
+    result = CH224_RequestVoltage(mv);
     if (!result) {
-        request_voltage_mv = mv;
+        request_voltage = mv;
     }
 }
 
-uint16_t pd_get_max_available_current(void) {//mA
-    return ch224_read_max_current();
+uint16_t PD_GetMaxAvailableCurrent(void) {//mA
+    uint16_t result;
+    result = CH224_ReadMaxCurrent();
+    if (result == 0xFF) {
+        return 1;
+    }
+    return result;
 }
 
-const char *pd_get_protocol_type(void) {
+const char *PD_GetProtocolType(void) {
     uint8_t voltage_flag;
     uint8_t status;
-    voltage_flag = ch224_read_register(0x0A);
-    status = ch224_read_status();
+    voltage_flag = CH224_ReadRegister(0x0A);
+    status = CH224_ReadStatus();
     if (status == 0xFF) return "PD OFF";
     if (status & CH224_STATUS_PD_ACTIVE) {
         if (voltage_flag == 6) {

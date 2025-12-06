@@ -18,10 +18,10 @@
 //<<AICUBE_USER_INCLUDE_END>>
 
 int *BGV = (int idata*) 0xef;                                       //内部1.19V参考信号源值存放在idata中
+unsigned char vcc = 0;
 //<<AICUBE_USER_GLOBAL_DEFINE_BEGIN>>
 // 在此添加用户全局变量定义、用户宏定义以及函数声明  
 //<<AICUBE_USER_GLOBAL_DEFINE_END>>
-
 
 
 ////////////////////////////////////////
@@ -42,6 +42,7 @@ void ADC_Init(void)
 
     ADC_ActiveChannel(3);               //选择ADC通道
     ADC_Enable();                       //使能ADC功能
+    vcc = (int) (4096L * *BGV / ADC_Convert(0xf));
 
     //<<AICUBE_USER_ADC_INITIAL_BEGIN>>
     // 在此添加用户初始化代码  

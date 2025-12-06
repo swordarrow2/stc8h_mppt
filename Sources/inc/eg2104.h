@@ -7,10 +7,12 @@
 
 #include "config.h"
 
-void eg2104_enable(void);
+void EG2104_Init(void);
 
-void eg2104_disable(void);
+void EG2104_Enable(void);
 
-void eg2104_set_duty(float value);
+void EG2104_Disable(void);
+
+void EG2104_SetDuty(float value);
 
 #endif //STC_MPPT_EG2104_H

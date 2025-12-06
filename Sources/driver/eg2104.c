@@ -6,14 +6,19 @@
 
 #define EG2104_SD P15
 
-void eg2104_enable(void) {
+void EG2104_Init(void) {
+    EG2104_Disable();
+    EG2104_SetDuty(0.0f);
+}
+
+void EG2104_Enable(void) {
     EG2104_SD = 1;
 }
 
-void eg2104_disable(void) {
+void EG2104_Disable(void) {
     EG2104_SD = 0;
 }
 
-void eg2104_set_duty(float value) {
+void EG2104_SetDuty(float value) {
     PWM_UpdateDuty(PWMA_CH3, value, PWM_MODE1);
 }
