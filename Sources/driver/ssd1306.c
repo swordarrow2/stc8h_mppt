@@ -212,10 +212,9 @@ void OLED_DrawFillRect(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
 
 // 显示字符（5x8字体）- 针对5x8字体优化
 void OLED_PutChar(uint8_t x, uint8_t y, char ch) {
-    uint8_t i, j, page, bit_offset;
+    uint8_t i, page, bit_offset;
     uint16_t index;
     uint8_t _data;
-    char buffer[12];
     // 检查边界
     if (x >= OLED_WIDTH - 4 || y >= OLED_HEIGHT) return;
     // 计算字体数据索引（ASCII 32-126）
@@ -349,7 +348,7 @@ void OLED_SetDisplayMode(uint8_t mode) {
 
 // 绘制位图（任意位置和大小）
 void OLED_DrawBitmapCustom(uint8_t x, uint8_t y, uint8_t width, uint8_t height, const uint8_t *bitmap) {
-    uint8_t i, j, page, bit_offset;
+    uint8_t i, j;
     uint16_t bmp_index = 0;
 
     // 按列处理

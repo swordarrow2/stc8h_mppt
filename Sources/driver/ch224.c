@@ -114,7 +114,7 @@ BOOL CH224_WriteRegister(uint8_t reg_addr, uint8_t value) {
 ////////////////////////////////////////
 // 示例: 检测CH224芯片是否连接
 // 入口参数: 无
-// 函数返回: 0-已连接，1-未连接
+// 函数返回: 1-已连接，0-未连接
 ////////////////////////////////////////
 uint8_t CH224_CheckConnection(void) {
     uint8_t status;
@@ -123,10 +123,10 @@ uint8_t CH224_CheckConnection(void) {
 
     // 如果读取成功且不是0xFF(默认值)或0x00
     if (status != 0xFF && status != 0x00) {
-        return 0;  // 芯片已连接
+        return 1;  // 芯片已连接
     }
 
-    return 1;  // 芯片未连接
+    return 0;  // 芯片未连接
 }
 
 ////////////////////////////////////////

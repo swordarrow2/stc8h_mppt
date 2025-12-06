@@ -9,30 +9,19 @@
 ////////////////////////////////////////
 //<<AICUBE_USER_HEADER_REMARK_END>>
 
-
 #include "../inc/config.h"
 
-
-//<<AICUBE_USER_INCLUDE_BEGIN>>
-// 在此添加用户头文件包含  
-//<<AICUBE_USER_INCLUDE_END>>
-
-
-//<<AICUBE_USER_GLOBAL_DEFINE_BEGIN>>
-// 在此添加用户全局变量定义、用户宏定义以及函数声明  
-//<<AICUBE_USER_GLOBAL_DEFINE_END>>
-
-
+extern bit screen_dirty;
+extern bit logic_dirty;
 
 ////////////////////////////////////////
 // 定时器0初始化函数
 // 入口参数: 无
 // 函数返回: 无
 ////////////////////////////////////////
-void TIMER0_Init(void)
-{
+void TIMER0_Init(void) {
 #define T0_PSCR                 (0)
-#define T0_RELOAD               (65536 - (float)SYSCLK / 12 / (T0_PSCR + 1) * 100 / 1000000)
+#define T0_RELOAD               (65536 - (float)SYSCLK / 12 / (T0_PSCR + 1) * 10 / 1000)
 
     TIMER0_TimerMode();                 //设置定时器0为定时模式
     TIMER0_12TMode();                   //设置定时器0为12T模式
@@ -43,10 +32,6 @@ void TIMER0_Init(void)
     TIMER0_SetPrescale(T0_PSCR);        //设置定时器0的8位预分频
     TIMER0_SetReload16(T0_RELOAD);      //设置定时器0的16位重载值
     TIMER0_Run();                       //定时器0开始运行
-
-    //<<AICUBE_USER_TIMER0_INITIAL_BEGIN>>
-    // 在此添加用户初始化代码  
-    //<<AICUBE_USER_TIMER0_INITIAL_END>>
 }
 
 ////////////////////////////////////////
@@ -54,8 +39,7 @@ void TIMER0_Init(void)
 // 入口参数: 无
 // 函数返回: 无
 ////////////////////////////////////////
-void TIMER2_Init(void)
-{
+void TIMER2_Init(void) {
 #define T2_PSCR                 (0)
 #ifdef BAUDRATE
 #undef BAUDRATE
@@ -68,28 +52,19 @@ void TIMER2_Init(void)
     TIMER2_SetPrescale(T2_PSCR);        //设置定时器2的8位预分频
     TIMER2_SetReload16(T2_RELOAD);      //设置定时器2的16位重载值
     TIMER2_Run();                       //定时器2开始运行
-
-    //<<AICUBE_USER_TIMER2_INITIAL_BEGIN>>
-    // 在此添加用户初始化代码  
-    //<<AICUBE_USER_TIMER2_INITIAL_END>>
 }
-
 
 ////////////////////////////////////////
 // 定时器0中断服务程序
 // 入口参数: 无
 // 函数返回: 无
 ////////////////////////////////////////
-void TIMER0_ISR(void) interrupt TMR0_VECTOR
-{
-    //<<AICUBE_USER_TIMER0_ISR_CODE1_BEGIN>>
-    // 在此添加中断函数用户代码  
-    //<<AICUBE_USER_TIMER0_ISR_CODE1_END>>
+void TIMER0_ISR(void) interrupt TMR0_VECTOR { //100Hz
+    static uint8_t flag = 0;
+    logic_dirty = 1;
+    ++flag;
+    if (flag == 100) {
+        screen_dirty = 1;
+        flag = 0;
+    }
 }
-
-
-//<<AICUBE_USER_FUNCTION_IMPLEMENT_BEGIN>>
-// 在此添加用户函数实现代码  
-//<<AICUBE_USER_FUNCTION_IMPLEMENT_END>>
-
-

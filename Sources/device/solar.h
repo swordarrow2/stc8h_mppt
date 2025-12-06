@@ -13,6 +13,6 @@ void SOLAR_EnableInput(void);
 
 void SOLAR_DisableInput(void);
 
-uint16_t SOLAR_GetActualVoltage(void);//mV
+uint16_t SOLAR_GetVoltage(void);//mV
 
 #endif //STC_MPPT_SOLAR_H

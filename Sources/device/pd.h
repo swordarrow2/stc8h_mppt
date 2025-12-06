@@ -14,6 +14,8 @@
 // º¯ÊıÉùÃ÷
 uint8_t PD_Init(void);
 
+uint8_t PD_Is_Connecting(void);
+
 void PD_EnableInput(void);
 
 void PD_DisableInput(void);

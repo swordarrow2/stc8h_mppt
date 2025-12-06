@@ -54,12 +54,11 @@
 //#include "ssd1306.h"
 //#include "ch224.h"
 //#include "oled.h"
-//#include "../device/dcdc.h"
+#include "../device/dcdc.h"
 //#include "../device/pd.h"
 //#include "../device/battery.h"
 //#include "../device/solar.h"
 #include "../device/screen.h"
-#include "../device/logic.h"
 
 
 void SYS_Init(void);

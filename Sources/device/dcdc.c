@@ -11,30 +11,99 @@
 
 static float duty = 0;
 static DCDC_Mode_t current_mode = DCDC_MODE_NORMAL;
+static DCDC_UpdateFunc_t current_update_func = NULL;
 
+bit logic_dirty = 0;
+
+static void DCDC_Update_Normal(void);
+
+static void DCDC_Update_PD(void);
+
+static void DCDC_Update_MPPT(void);
+
+static const DCDC_UpdateFunc_t mode_update_funcs[] = {
+        DCDC_Update_Normal,
+        DCDC_Update_PD,
+        DCDC_Update_MPPT
+};
+
+// 普通电源模式更新函数
+static void DCDC_Update_Normal(void) {
+    // 普通电源模式：固定输出电压或电流
+    // 这里可以实现固定电压/电流控制逻辑
+
+}
+
+// PD模式更新函数
+static void DCDC_Update_PD(void) {
+    if (BAT_GetVoltage() < 7500) {
+        DCDC_IncDuty();
+    } else {
+        DCDC_DecDuty();
+    }
+
+}
+
+// MPPT模式更新函数
+static void DCDC_Update_MPPT(void) {
+    // MPPT模式：最大功率点跟踪
+    static float last_power = 0;
+    static float last_duty = 0;
+    float voltage, current, power;
+    // 假设每100ms执行一次MPPT算法
+    // if (GetCurrentTime() - last_mppt_time >= 100) {
+    //     last_mppt_time = GetCurrentTime();
+
+    // 获取当前输入电压电流
+    voltage = DCDC_GetInputVoltage() / 1000.0f;  // 转换为V
+    current = DCDC_GetInputCurrent() / 1000.0f;  // 转换为A
+    power = voltage * current;
+
+    // 扰动观察法(P&O)实现
+    if (power > last_power) {
+        // 功率增加，继续同方向扰动
+        if (duty > last_duty) {
+            DCDC_IncDuty();
+        } else {
+            DCDC_DecDuty();
+        }
+    } else {
+        // 功率减小，改变扰动方向
+        if (duty > last_duty) {
+            DCDC_DecDuty();
+        } else {
+            DCDC_IncDuty();
+        }
+    }
+
+    last_power = power;
+    last_duty = duty;
+    // }
+}
+
+// 主更新函数 - 直接调用当前模式的函数指针
 void DCDC_Update(void) {
-    //TODO - 根据模式执行不同的控制逻辑
-    switch (current_mode) {
-        case DCDC_MODE_NORMAL:
-            // 普通电源模式：固定输出电压或电流
-            // 这里可以添加固定输出控制逻辑
-            break;
-
-        case DCDC_MODE_PD:
-            // PD模式：功率传输协议
-            // 这里可以添加PD协议协商和控制逻辑
-            break;
-
-        case DCDC_MODE_MPPT:
-            // MPPT模式：最大功率点跟踪
-            // 这里添加MPPT算法逻辑
-            // 例如扰动观察法(P&O)或电导增量法
-            break;
+    if (PD_Is_Connecting()) {
+        DCDC_SetMode(DCDC_MODE_PD);
+        BAT_EnableOutput();
+        DCDC_Enable();
+    } else if (SOLAR_GetVoltage() > PD_GetActualVoltage()) {
+        DCDC_SetMode(DCDC_MODE_PD);
+        BAT_EnableOutput();
+        DCDC_Enable();
+    }
+//TODO:MPPT
+    if (current_update_func != NULL) {
+        current_update_func();
     }
 }
 
 void DCDC_Init(void) {
     EG2104_Init();
+    current_update_func = mode_update_funcs[current_mode];
+    BAT_Init();
+    PD_Init();
+    SOLAR_Init();
 }
 
 void DCDC_Enable(void) {
@@ -86,33 +155,40 @@ void DCDC_SetMode(DCDC_Mode_t mode) {
     switch (current_mode) {
         case DCDC_MODE_MPPT:
             // 退出MPPT模式时，停止MPPT跟踪
+            SOLAR_DisableInput();
             break;
         case DCDC_MODE_PD:
             // 退出PD模式时的清理工作
+            PD_DisableInput();
         case DCDC_MODE_NORMAL:
             // 退出普通模式时的清理工作
+            SOLAR_DisableInput();
             break;
         default:
             break;
     }
     // 设置新模式
     current_mode = mode;
+    current_update_func = mode_update_funcs[mode];
+    DCDC_SetDuty(0.0f);
     // 模式切换后的初始化
     switch (mode) {
         case DCDC_MODE_NORMAL:
             // 普通模式：设置默认参数
-            DCDC_SetDuty(50.0f);  // 默认50%占空比
+            SOLAR_EnableInput();
             break;
 
         case DCDC_MODE_PD:
             // PD模式：初始化PD协议
             // 这里可以添加PD协议初始化
-            DCDC_SetDuty(0);  // 从0开始协商
+            PD_EnableInput();
+            DCDC_SetDuty(0.0f);
             break;
 
         case DCDC_MODE_MPPT:
             // MPPT模式：初始化MPPT算法
             // 可以根据当前输入电压电流初始化占空比
+            SOLAR_EnableInput();
             break;
     }
 }

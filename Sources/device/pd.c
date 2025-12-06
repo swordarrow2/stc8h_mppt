@@ -13,6 +13,10 @@ static uint16_t request_voltage = 5000; //mV
 
 uint8_t PD_Init(void) {
     CH224_Init();
+    return 0;
+}
+
+uint8_t PD_Is_Connecting(void) {
     return CH224_CheckConnection();
 }
 
@@ -54,7 +58,7 @@ const char *PD_GetProtocolType(void) {
     uint8_t status;
     voltage_flag = CH224_ReadRegister(0x0A);
     status = CH224_ReadStatus();
-    if (status == 0xFF) return "PD OFF";
+    if (status == 0xFF || status == 0x00) return "PD OFF";
     if (status & CH224_STATUS_PD_ACTIVE) {
         if (voltage_flag == 6) {
             return "PD-PPS";
@@ -65,11 +69,11 @@ const char *PD_GetProtocolType(void) {
         if (status & CH224_STATUS_EPR_ACTIVE) {
             return "PD-EPR";
         }
-        return "PD";
+        return "USB PD";
     }
     if (status & CH224_STATUS_QC3_ACTIVE) return "QC3.0";
     if (status & CH224_STATUS_QC2_ACTIVE) return "QC2.0";
     if (status & CH224_STATUS_BC_ACTIVE) return "BC1.2";
 
-    return "Unknown";
+    return "NC";
 }

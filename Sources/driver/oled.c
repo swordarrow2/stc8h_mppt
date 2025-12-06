@@ -22,7 +22,7 @@ static void init_regions(void) {
 
         regions[i].label[0] = '\0';
         regions[i].value[0] = '\0';
-        regions[i].display_mode = DISPLAY_LABEL;
+        regions[i].display_mode = DISPLAY_BOTH;
         regions[i].dirty = 1;
 
         // ¼ÆËãÇøÓò×ø±ê£¨¿¼ÂÇ±ß¿ò£©

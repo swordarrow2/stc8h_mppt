@@ -410,11 +410,6 @@
               <FilePath>.\Sources\device\dcdc.c</FilePath>
             </File>
             <File>
-              <FileName>logic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Sources\device\logic.c</FilePath>
-            </File>
-            <File>
               <FileName>screen.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\device\screen.c</FilePath>

@@ -19,9 +19,9 @@
 #define REGION_BOTTOM_RIGHT   8
 
 // 文本显示模式
-#define DISPLAY_LABEL         2  // 只显示标签
+#define DISPLAY_LABEL         0  // 只显示标签
 #define DISPLAY_VALUE         1  // 只显示数值
-#define DISPLAY_BOTH          0  // 显示标签和数值
+#define DISPLAY_BOTH          2  // 显示标签和数值
 
 #define REGION_BORDER_WIDTH   1   // 区域边框厚度（像素）
 
