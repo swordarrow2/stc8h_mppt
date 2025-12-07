@@ -41,43 +41,26 @@ uint16_t CH224_ReadMaxCurrent() {
 ////////////////////////////////////////
 uint8_t CH224_ReadRegister(uint8_t reg_addr) {
     uint8_t _data = 0xFF;
-
-    // I2C读操作流程:
-    // 1. 发送起始信号
-    // 2. 发送设备地址(写)
-    // 3. 发送寄存器地址
-    // 4. 发送重复起始信号
-    // 5. 发送设备地址(读)
-    // 6. 读取数据
-    // 7. 发送停止信号
-
     I2C_MasterStart();                      // 起始信号
-
     // 发送设备地址(写) = (7位地址 << 1) | 0
     if (I2C_MasterSendByte((ch224_i2c_addr << 1) | 0)) {
         I2C_MasterStop();                   // 通信失败，停止
         return 0xFF;
     }
-
     // 发送寄存器地址
     if (I2C_MasterSendByte(reg_addr)) {
         I2C_MasterStop();                   // 通信失败，停止
         return 0xFF;
     }
-
     I2C_MasterStart();                      // 重复起始信号
-
     // 发送设备地址(读) = (7位地址 << 1) | 1
     if (I2C_MasterSendByte((ch224_i2c_addr << 1) | 1)) {
         I2C_MasterStop();                   // 通信失败，停止
         return 0xFF;
     }
-
     // 读取数据，最后发送NAK
     _data = I2C_MasterReadByte(1);           // 1表示发送NAK
-
     I2C_MasterStop();                       // 停止信号
-
     return _data;
 }
 
@@ -108,24 +91,17 @@ BOOL CH224_WriteRegister(uint8_t reg_addr, uint8_t value) {
     return 0;                               // 成功
 }
 
-//<<AICUBE_USER_FUNCTION_IMPLEMENT_BEGIN>>
-// 在此添加用户函数实现代码
-
 ////////////////////////////////////////
 // 示例: 检测CH224芯片是否连接
 // 入口参数: 无
 // 函数返回: 1-已连接，0-未连接
 ////////////////////////////////////////
 uint8_t CH224_CheckConnection(void) {
-    uint8_t status;
-
-    status = CH224_ReadStatus();
-
+    uint8_t status = CH224_ReadStatus();
     // 如果读取成功且不是0xFF(默认值)或0x00
     if (status != 0xFF && status != 0x00) {
         return 1;  // 芯片已连接
     }
-
     return 0;  // 芯片未连接
 }
 

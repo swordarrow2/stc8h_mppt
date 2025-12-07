@@ -11,8 +11,6 @@
 
 #include "../inc/config.h"
 
-extern bit screen_dirty;
-extern bit logic_dirty;
 extern uint16_t main_loop_time;
 
 ////////////////////////////////////////
@@ -60,17 +58,6 @@ void TIMER1_Init(void)
     //<<AICUBE_USER_TIMER1_INITIAL_END>>
 }
 
-
-////////////////////////////////////////
-// 定时器1中断服务程序
-// 入口参数: 无
-// 函数返回: 无
-////////////////////////////////////////
-void TIMER1_ISR(void) interrupt TMR1_VECTOR
-{//1KHz = 1ms
-    ++main_loop_time;
-}
-
 ////////////////////////////////////////
 // 定时器2初始化函数
 // 入口参数: 无
@@ -98,11 +85,14 @@ void TIMER2_Init(void) {
 ////////////////////////////////////////
 void TIMER0_ISR(void) interrupt TMR0_VECTOR
 { //100Hz
-    static uint8_t flag = 0;
-    logic_dirty = 1;
-    ++flag;
-    if (flag == 100) {
-        screen_dirty = 1;
-        flag = 0;
-    }
+}
+
+////////////////////////////////////////
+// 定时器1中断服务程序
+// 入口参数: 无
+// 函数返回: 无
+////////////////////////////////////////
+void TIMER1_ISR(void) interrupt TMR1_VECTOR
+{//1KHz = 1ms
+    ++main_loop_time;
 }

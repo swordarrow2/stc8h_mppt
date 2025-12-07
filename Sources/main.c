@@ -14,8 +14,6 @@
 #include "./device/screen.h"
 #include "./device/dcdc.h"
 
-extern bit screen_dirty;
-extern bit logic_dirty;
 uint16_t main_loop_time = 0;// 1ms
 uint16_t last_main_loop_time = 0;// 1ms
 
@@ -23,44 +21,13 @@ void main(void) {
     SYS_Init();
     SCREEN_Init();
     DCDC_Init();
-
-//    status = CH224_ReadStatus();// 检查PD协议是否激活
-//    if (status & CH224_STATUS_PD_ACTIVE) {
-//        ret = CH224_SetVoltage(CH224_VOLTAGE_9V);
-//        if (ret == 0) {
-//            // 可以读取当前最大电流
-//            ret = CH224_ReadCurrentValue(&current_ma);
-//            if (ret == 0) {
-//                // current_ma 现在包含最大电流值(单位: mA)
-//                OLED_PutNumber(42, 10, current_ma);
-//            }
-//        }
-//    }
-//    result = CH224_EnablePPS(7700);
     while (1) {
         main_loop_time = 1;
         TIMER1_Run();
-//        if (logic_dirty) {
         DCDC_Update();
-//            logic_dirty = 0;
-//        }
-//        if (screen_dirty) {
         SCREEN_Update();
-//            screen_dirty = 0;
         TIMER1_Stop();
         last_main_loop_time = main_loop_time;
-//        }
-//        printf_usb("%d",last_main_loop_time);
-//        current_ma = PD_GetMaxAvailableCurrent();  // 可以读取当前最大电流
-//
-//        OLED_UI_SetRegionLabel(REGION_TOP_LEFT, PD_GetProtocolType());
-//
-//        sprintf(str_buffer, "%d", current_ma);
-
-//        OLED_UI_SetRegionValue(REGION_MIDDLE_LEFT, str_buffer);
-//        OLED_UI_SetRegionLabel(REGION_MIDDLE_LEFT, "PD MAX");
-//        OLED_UI_UpdateDisplay();
-
     }
 }
 
@@ -89,7 +56,7 @@ void SYS_Init(void) {
     PORT1_Init();                       //P1口初始化
     PORT2_Init();                       //P2口初始化
     PORT3_Init();                       //P3口初始化
-    TIMER0_Init();                      //定时器0初始化
+//    TIMER0_Init();                      //定时器0初始化
     TIMER1_Init();                      //定时器0初始化
     TIMER2_Init();                      //定时器2初始化
     UART2_Init();                       //串口2初始化
@@ -102,11 +69,6 @@ void SYS_Init(void) {
     USBLIB_Init();                      //USB库初始化
     delay_ms(1);
     MATHLIB_Init();                     //MATH库初始化
-
-    //<<AICUBE_USER_INITIAL_CODE_BEGIN>>
-    // 在此添加用户初始化代码
-    //<<AICUBE_USER_INITIAL_CODE_END>>
-
     EnableGlobalInt();                  //使能全局中断
 }
 
@@ -121,7 +83,6 @@ void delay_us(uint16_t us) {
     } while (--us);
 }
 
-
 ////////////////////////////////////////
 // 毫秒延时函数
 // 入口参数: ms (设置延时的毫秒值)
@@ -135,10 +96,3 @@ void delay_ms(uint16_t ms) {
         while (--i);
     } while (--ms);
 }
-
-
-//<<AICUBE_USER_FUNCTION_IMPLEMENT_BEGIN>>
-// 在此添加用户函数实现代码
-//<<AICUBE_USER_FUNCTION_IMPLEMENT_END>>
-
-

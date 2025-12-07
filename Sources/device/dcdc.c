@@ -13,89 +13,96 @@ static float duty = 0;
 static DCDC_Mode_t current_mode = DCDC_MODE_NORMAL;
 static DCDC_UpdateFunc_t current_update_func = NULL;
 
-bit logic_dirty = 0;
+// 输入输出限压限流值（单位：mV, mA）
+static uint16_t input_current_limit = 3000;   // 默认3A
+static uint16_t output_voltage_limit = 4200; // 默认4.2V
+static uint16_t output_current_limit = 200;  // 默认0.2A
 
 static void DCDC_Update_Normal(void);
-
-static void DCDC_Update_PD(void);
 
 static void DCDC_Update_MPPT(void);
 
 static const DCDC_UpdateFunc_t mode_update_funcs[] = {
         DCDC_Update_Normal,
-        DCDC_Update_PD,
         DCDC_Update_MPPT
 };
 
-// 普通电源模式更新函数
+static void DCDC_IncDuty(void) {
+    if (duty < MAX_DUTY) {
+        duty += 0.75f;
+        EG2104_SetDuty(duty);
+    }
+}
+
+static void DCDC_DecDuty(void) {
+    if (duty > 0) {
+        duty -= 0.75f;
+        EG2104_SetDuty(duty);
+    }
+}
+
+float DCDC_GetDuty(void) {
+    return duty;
+}
+
+static void DCDC_SetDuty(float value) {
+    if (value <= MAX_DUTY && 0 < value) {
+        duty = value;
+        EG2104_SetDuty(value);
+    }
+}
+
+// 普通模式更新函数 - 根据输入输出限压限流调整占空比
 static void DCDC_Update_Normal(void) {
-    // 普通电源模式：固定输出电压或电流
-    // 这里可以实现固定电压/电流控制逻辑
-    if (BAT_GetCurrent() < 500 && BAT_GetVoltage() < 5000) {
+    uint16_t input_current = DCDC_GetInputCurrent();
+    uint16_t output_voltage = BAT_GetVoltage();
+    uint16_t output_current = BAT_GetCurrent();
+
+    if (input_current < input_current_limit &&
+        output_voltage < output_voltage_limit &&
+        output_current < output_current_limit) {
         DCDC_IncDuty();
     } else {
         DCDC_DecDuty();
     }
 }
 
-// PD模式更新函数
-static void DCDC_Update_PD(void) {
-    if (BAT_GetCurrent() < 500 && BAT_GetVoltage() < 5000 && DCDC_GetInputCurrent() < 500) {
-        DCDC_IncDuty();
-    } else {
-        DCDC_DecDuty();
-    }
-}
-
-// MPPT模式更新函数
+// MPPT模式更新函数 - 扰动观察法
 static void DCDC_Update_MPPT(void) {
-    // MPPT模式：最大功率点跟踪
     static float last_power = 0;
     static float last_duty = 0;
     float voltage, current, power;
-    // 假设每100ms执行一次MPPT算法
-    // if (GetCurrentTime() - last_mppt_time >= 100) {
-    //     last_mppt_time = GetCurrentTime();
 
-    // 获取当前输入电压电流
     voltage = DCDC_GetInputVoltage() / 1000.0f;  // 转换为V
     current = DCDC_GetInputCurrent() / 1000.0f;  // 转换为A
     power = voltage * current;
 
-    // 扰动观察法(P&O)实现
+    // 扰动观察法(P&O)
     if (power > last_power) {
-        // 功率增加，继续同方向扰动
         if (duty > last_duty) {
             DCDC_IncDuty();
         } else {
             DCDC_DecDuty();
         }
     } else {
-        // 功率减小，改变扰动方向
         if (duty > last_duty) {
             DCDC_DecDuty();
         } else {
             DCDC_IncDuty();
         }
     }
-
     last_power = power;
     last_duty = duty;
-    // }
 }
 
-// 主更新函数 - 直接调用当前模式的函数指针
+// 主更新函数 - 由外部调度器调用
 void DCDC_Update(void) {
-    if (PD_Is_Connecting()) {
-        DCDC_SetMode(DCDC_MODE_PD);
-        BAT_EnableOutput();
-        DCDC_Enable();
-    } else if (SOLAR_GetVoltage() > PD_GetActualVoltage()) {
-        DCDC_SetMode(DCDC_MODE_PD);
-        BAT_EnableOutput();
-        DCDC_Enable();
+    if (SOLAR_GetVoltage() > PD_GetActualVoltage()) {
+        DCDC_SetMode(DCDC_MODE_MPPT);
+    } else {
+        DCDC_SetMode(DCDC_MODE_NORMAL);
     }
-//TODO:MPPT
+
     if (current_update_func != NULL) {
         current_update_func();
     }
@@ -105,98 +112,59 @@ void DCDC_Init(void) {
     EG2104_Init();
     current_update_func = mode_update_funcs[current_mode];
     BAT_Init();
-    PD_Init();
     SOLAR_Init();
+    duty = 0.0f;
+    DCDC_Enable();
 }
 
 void DCDC_Enable(void) {
+    BAT_EnableOutput();
     EG2104_Enable();
 }
 
 void DCDC_Disable(void) {
+    BAT_DisableOutput();
     EG2104_Disable();
 }
 
-uint16_t DCDC_GetInputVoltage(void) { //mV
+uint16_t DCDC_GetInputVoltage(void) { // mV
     return (uint16_t) (vcc / 4095.0 * ADC_Convert(ADC_CHANNEL_DCDC_IN_U) * 11);
 }
 
-uint16_t DCDC_GetInputCurrent(void) { //mA
-//I=U/R    U=ADC_u/100  R=0.005f
-//((vcc / 1024.0 * ADCRead(ADC_CHANNAL_I1)) / 100.0 / 5*1000)
+uint16_t DCDC_GetInputCurrent(void) { // mA
     return (uint16_t) (vcc / 4095.0 * ADC_Convert(ADC_CHANNEL_DCDC_IN_I) * 2);
 }
 
-void DCDC_IncDuty(void) {
-    if (duty < MAX_DUTY) {
-        duty += 1;
-        EG2104_SetDuty(duty);
-    }
-}
-
-void DCDC_DecDuty(void) {
-    if (duty > 0) {
-        duty -= 1;
-        EG2104_SetDuty(duty);
-    }
-}
-
-float DCDC_GetDuty(void) {
-    return duty;
-}
-
-void DCDC_SetDuty(float value) {
-    if (value <= MAX_DUTY && 0 < value) {
-        duty = value;
-        EG2104_SetDuty(value);
-    }
-}
-
-// 添加模式设置函数
 void DCDC_SetMode(DCDC_Mode_t mode) {
     if (mode == current_mode) {
         return;
     }
-    // 模式切换前的处理
+    BAT_DisableOutput();
+    DCDC_Disable();
     switch (current_mode) {
         case DCDC_MODE_MPPT:
-            // 退出MPPT模式时，停止MPPT跟踪
             SOLAR_DisableInput();
             break;
-        case DCDC_MODE_PD:
-            // 退出PD模式时的清理工作
-            PD_DisableInput();
         case DCDC_MODE_NORMAL:
-            // 退出普通模式时的清理工作
-            SOLAR_DisableInput();
+            SOLAR_EnableInput();
             break;
         default:
             break;
     }
-    // 设置新模式
     current_mode = mode;
     current_update_func = mode_update_funcs[mode];
-    DCDC_SetDuty(0.0f);
-    // 模式切换后的初始化
     switch (mode) {
         case DCDC_MODE_NORMAL:
-            // 普通模式：设置默认参数
             SOLAR_EnableInput();
+            DCDC_SetDuty(0.0f);  // 普通模式初始占空比为0
             break;
-
-        case DCDC_MODE_PD:
-            // PD模式：初始化PD协议
-            // 这里可以添加PD协议初始化
-            PD_EnableInput();
-            DCDC_SetDuty(0.0f);
-            break;
-
         case DCDC_MODE_MPPT:
-            // MPPT模式：初始化MPPT算法
-            // 可以根据当前输入电压电流初始化占空比
             SOLAR_EnableInput();
+            DCDC_SetDuty(10.0f);  // MPPT模式初始占空比50%
             break;
     }
+    DCDC_Enable();
+    BAT_EnableOutput();
 }
 
 DCDC_Mode_t DCDC_GetMode(void) {
@@ -206,12 +174,34 @@ DCDC_Mode_t DCDC_GetMode(void) {
 const char *DCDC_GetModeString(void) {
     switch (current_mode) {
         case DCDC_MODE_NORMAL:
-            return "DC IN";
-        case DCDC_MODE_PD:
-            return "USB PD";
+            return "NORMAL";
         case DCDC_MODE_MPPT:
             return "MPPT";
         default:
             return "Unknown";
     }
+}
+
+void DCDC_SetInputCurrentLimit(uint16_t current_ma) {
+    input_current_limit = current_ma;
+}
+
+void DCDC_SetOutputVoltageLimit(uint16_t voltage_mv) {
+    output_voltage_limit = voltage_mv;
+}
+
+void DCDC_SetOutputCurrentLimit(uint16_t current_ma) {
+    output_current_limit = current_ma;
+}
+
+uint16_t DCDC_GetInputCurrentLimit(void) {
+    return input_current_limit;
+}
+
+uint16_t DCDC_GetOutputVoltageLimit(void) {
+    return output_voltage_limit;
+}
+
+uint16_t DCDC_GetOutputCurrentLimit(void) {
+    return output_current_limit;
 }

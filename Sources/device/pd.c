@@ -58,7 +58,7 @@ const char *PD_GetProtocolType(void) {
     uint8_t status;
     voltage_flag = CH224_ReadRegister(0x0A);
     status = CH224_ReadStatus();
-    if (status == 0xFF || status == 0x00) return "PD NC";
+    if (status == 0xFF || status == 0x00) return "PD";
     if (status & CH224_STATUS_PD_ACTIVE) {
         if (voltage_flag == 6) {
             return "PD-PPS";
@@ -75,5 +75,5 @@ const char *PD_GetProtocolType(void) {
     if (status & CH224_STATUS_QC2_ACTIVE) return "QC2.0";
     if (status & CH224_STATUS_BC_ACTIVE) return "BC1.2";
 
-    return "PD NC";
+    return "PD";
 }

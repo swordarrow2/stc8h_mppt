@@ -53,31 +53,13 @@ static void draw_region(uint8_t region_idx) {
     uint8_t text_width_pixels = 0, center_x = 0, center_y = 0, label_x = 0, label_y = 0, value_x = 0, value_y = 0, x = 0, y = 0, border_x1, border_y1, border_x2, border_y2;
 
     region = &regions[region_idx];
-    // 首先清空整个区域（包括边框）
-//    for (y = region->y_start - REGION_BORDER_WIDTH; y < region->y_start + region->height + REGION_BORDER_WIDTH; y++) {
-//        for (x = region->x_start - REGION_BORDER_WIDTH;
-//             x < region->x_start + region->width + REGION_BORDER_WIDTH; x++) {
-//            // 确保坐标在屏幕范围内
-//            if (x < SSD1306_WIDTH && y < SSD1306_HEIGHT) {
-//                SSD1306_SetPixel(x, y, 0);
-//            }
-//        }
-//    }
     border_x1 = region->x_start - REGION_BORDER_WIDTH;
     border_y1 = region->y_start - REGION_BORDER_WIDTH;
     border_x2 = region->x_start + region->width;
     border_y2 = region->y_start + region->height;
 
-    // 绘制边框（使用实心矩形或空心矩形）
     // 这里使用空心矩形作为边框
     SSD1306_DrawRect(border_x1, border_y1, border_x2, border_y2);
-
-    // 清空边框内的内容区域（为文本准备）
-//    for (y = region->y_start; y < region->y_start + region->height; y++) {
-//        for (x = region->x_start; x < region->x_start + region->width; x++) {
-//            SSD1306_SetPixel(x, y, 0);
-//        }
-//    }
     // 计算文本居中位置（使用像素坐标）
     text_width_pixels = 0;
     display_text = NULL;
@@ -114,7 +96,7 @@ static void draw_region(uint8_t region_idx) {
             text_width_pixels = strlen(region->label) * 6 - 1;
             if (text_width_pixels <= region->width) {
                 label_x = region->x_start + (region->width - text_width_pixels) / 2;
-                label_y = region->y_start + 1;  // 上方留点边距
+                label_y = region->y_start + 2;  // 上方留点边距
                 SSD1306_PutString(region->x_start, label_y, "       ");
                 SSD1306_PutString(label_x, label_y, region->label);
             }
