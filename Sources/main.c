@@ -16,6 +16,8 @@
 
 extern bit screen_dirty;
 extern bit logic_dirty;
+uint16_t main_loop_time = 0;// 1ms
+uint16_t last_main_loop_time = 0;// 1ms
 
 void main(void) {
     SYS_Init();
@@ -36,14 +38,19 @@ void main(void) {
 //    }
 //    result = CH224_EnablePPS(7700);
     while (1) {
-        if (logic_dirty) {
+        main_loop_time = 1;
+        TIMER1_Run();
+//        if (logic_dirty) {
             DCDC_Update();
-            logic_dirty = 0;
-        }
-        if (screen_dirty) {
+//            logic_dirty = 0;
+//        }
+//        if (screen_dirty) {
             SCREEN_Update();
-            screen_dirty = 0;
-        }
+//            screen_dirty = 0;
+            last_main_loop_time = main_loop_time;
+//        }
+        TIMER1_Stop();
+//        printf_usb("%d",last_main_loop_time);
 //        current_ma = PD_GetMaxAvailableCurrent();  // 可以读取当前最大电流
 //
 //        OLED_UI_SetRegionLabel(REGION_TOP_LEFT, PD_GetProtocolType());
@@ -83,6 +90,7 @@ void SYS_Init(void) {
     PORT2_Init();                       //P2口初始化
     PORT3_Init();                       //P3口初始化
     TIMER0_Init();                      //定时器0初始化
+    TIMER1_Init();                      //定时器0初始化
     TIMER2_Init();                      //定时器2初始化
     UART2_Init();                       //串口2初始化
     ADC_Init();                         //ADC初始化

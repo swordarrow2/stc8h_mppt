@@ -16,6 +16,9 @@
 
 
 void TIMER0_Init(void);
+
+void TIMER1_Init(void);
+
 void TIMER2_Init(void);
 
 

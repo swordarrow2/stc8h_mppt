@@ -35,7 +35,7 @@ void I2C_Init(void)
     I2C_SwitchP2425();                  //选择I2C数据口: SCL(P2.5), SDA(P2.4)
 
     I2C_MasterMode();                   //设置I2C为主机模式
-    I2C_SetClockDivider(63);            //设置I2C为主机模式时钟 13:400K  63:93K
+    I2C_SetClockDivider(13);            //设置I2C为主机模式时钟 13:400K  63:93K
 
     I2C_SetIntPriority(0);              //设置中断为最低优先级
     I2C_EnableMasterInt();              //设置I2C主机模式中断
