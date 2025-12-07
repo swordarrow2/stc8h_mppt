@@ -41,15 +41,15 @@ void main(void) {
         main_loop_time = 1;
         TIMER1_Run();
 //        if (logic_dirty) {
-            DCDC_Update();
+        DCDC_Update();
 //            logic_dirty = 0;
 //        }
 //        if (screen_dirty) {
-            SCREEN_Update();
+        SCREEN_Update();
 //            screen_dirty = 0;
-            last_main_loop_time = main_loop_time;
-//        }
         TIMER1_Stop();
+        last_main_loop_time = main_loop_time;
+//        }
 //        printf_usb("%d",last_main_loop_time);
 //        current_ma = PD_GetMaxAvailableCurrent();  // 可以读取当前最大电流
 //
@@ -104,7 +104,7 @@ void SYS_Init(void) {
     MATHLIB_Init();                     //MATH库初始化
 
     //<<AICUBE_USER_INITIAL_CODE_BEGIN>>
-    // 在此添加用户初始化代码  
+    // 在此添加用户初始化代码
     //<<AICUBE_USER_INITIAL_CODE_END>>
 
     EnableGlobalInt();                  //使能全局中断
@@ -138,7 +138,7 @@ void delay_ms(uint16_t ms) {
 
 
 //<<AICUBE_USER_FUNCTION_IMPLEMENT_BEGIN>>
-// 在此添加用户函数实现代码  
+// 在此添加用户函数实现代码
 //<<AICUBE_USER_FUNCTION_IMPLEMENT_END>>
 
 

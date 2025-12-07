@@ -31,17 +31,20 @@ static const DCDC_UpdateFunc_t mode_update_funcs[] = {
 static void DCDC_Update_Normal(void) {
     // 普通电源模式：固定输出电压或电流
     // 这里可以实现固定电压/电流控制逻辑
-
-}
-
-// PD模式更新函数
-static void DCDC_Update_PD(void) {
-    if (BAT_GetVoltage() < 7500) {
+    if (BAT_GetCurrent() < 500 && BAT_GetVoltage() < 5000) {
         DCDC_IncDuty();
     } else {
         DCDC_DecDuty();
     }
+}
 
+// PD模式更新函数
+static void DCDC_Update_PD(void) {
+    if (BAT_GetCurrent() < 500 && BAT_GetVoltage() < 5000 && DCDC_GetInputCurrent() < 500) {
+        DCDC_IncDuty();
+    } else {
+        DCDC_DecDuty();
+    }
 }
 
 // MPPT模式更新函数
@@ -151,6 +154,9 @@ void DCDC_SetDuty(float value) {
 
 // 添加模式设置函数
 void DCDC_SetMode(DCDC_Mode_t mode) {
+    if (mode == current_mode) {
+        return;
+    }
     // 模式切换前的处理
     switch (current_mode) {
         case DCDC_MODE_MPPT:

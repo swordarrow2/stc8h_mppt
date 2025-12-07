@@ -41,7 +41,7 @@ void OLED_UI_Init(void);
 
 void OLED_UI_DrawGrid(void);
 
-void OLED_UI_UpdateDisplay(void);
+void OLED_UI_UpdateDisplay(uint8_t index);
 
 void OLED_UI_SetRegionLabel(uint8_t region, const char *label);
 

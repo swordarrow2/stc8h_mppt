@@ -13,8 +13,8 @@ static void init_regions(void) {
     uint8_t region_width, region_height, i, col, row;
 
     // 计算每个区域的大小（考虑边框）
-    region_width = OLED_WIDTH / 3;  // 128/3 ≈ 42.67
-    region_height = OLED_HEIGHT / 3; // 64/3 ≈ 21.33
+    region_width = SSD1306_WIDTH / 3;  // 128/3 ≈ 42.67
+    region_height = SSD1306_HEIGHT / 3; // 64/3 ≈ 21.33
 
     for (i = 0; i < 9; i++) {
         col = i % 3;
@@ -54,15 +54,15 @@ static void draw_region(uint8_t region_idx) {
 
     region = &regions[region_idx];
     // 首先清空整个区域（包括边框）
-    for (y = region->y_start - REGION_BORDER_WIDTH; y < region->y_start + region->height + REGION_BORDER_WIDTH; y++) {
-        for (x = region->x_start - REGION_BORDER_WIDTH;
-             x < region->x_start + region->width + REGION_BORDER_WIDTH; x++) {
-            // 确保坐标在屏幕范围内
-            if (x < OLED_WIDTH && y < OLED_HEIGHT) {
-                OLED_SetPixel(x, y, 0);
-            }
-        }
-    }
+//    for (y = region->y_start - REGION_BORDER_WIDTH; y < region->y_start + region->height + REGION_BORDER_WIDTH; y++) {
+//        for (x = region->x_start - REGION_BORDER_WIDTH;
+//             x < region->x_start + region->width + REGION_BORDER_WIDTH; x++) {
+//            // 确保坐标在屏幕范围内
+//            if (x < SSD1306_WIDTH && y < SSD1306_HEIGHT) {
+//                SSD1306_SetPixel(x, y, 0);
+//            }
+//        }
+//    }
     border_x1 = region->x_start - REGION_BORDER_WIDTH;
     border_y1 = region->y_start - REGION_BORDER_WIDTH;
     border_x2 = region->x_start + region->width;
@@ -70,14 +70,14 @@ static void draw_region(uint8_t region_idx) {
 
     // 绘制边框（使用实心矩形或空心矩形）
     // 这里使用空心矩形作为边框
-    OLED_DrawRect(border_x1, border_y1, border_x2, border_y2);
+    SSD1306_DrawRect(border_x1, border_y1, border_x2, border_y2);
 
     // 清空边框内的内容区域（为文本准备）
-    for (y = region->y_start; y < region->y_start + region->height; y++) {
-        for (x = region->x_start; x < region->x_start + region->width; x++) {
-            OLED_SetPixel(x, y, 0);
-        }
-    }
+//    for (y = region->y_start; y < region->y_start + region->height; y++) {
+//        for (x = region->x_start; x < region->x_start + region->width; x++) {
+//            SSD1306_SetPixel(x, y, 0);
+//        }
+//    }
     // 计算文本居中位置（使用像素坐标）
     text_width_pixels = 0;
     display_text = NULL;
@@ -102,7 +102,8 @@ static void draw_region(uint8_t region_idx) {
             center_x = region->x_start + (region->width - text_width_pixels) / 2;
             // 计算垂直居中：每个字符高8像素
             center_y = region->y_start + (region->height - 8) / 2;
-            OLED_PutString(center_x, center_y, display_text);
+            SSD1306_PutString(center_x, center_y, "       ");
+            SSD1306_PutString(center_x, center_y, display_text);
         }
     }
 
@@ -114,28 +115,28 @@ static void draw_region(uint8_t region_idx) {
             if (text_width_pixels <= region->width) {
                 label_x = region->x_start + (region->width - text_width_pixels) / 2;
                 label_y = region->y_start + 1;  // 上方留点边距
-                OLED_PutString(label_x, label_y, region->label);
+                SSD1306_PutString(region->x_start, label_y, "       ");
+                SSD1306_PutString(label_x, label_y, region->label);
             }
         }
-
         // 显示数值在下方
         if (strlen(region->value) > 0) {
             text_width_pixels = strlen(region->value) * 6 - 1;
             if (text_width_pixels <= region->width) {
                 value_x = region->x_start + (region->width - text_width_pixels) / 2;
                 value_y = region->y_start + region->height - 9;  // 下方留点边距
-                OLED_PutString(value_x, value_y, region->value);
+                SSD1306_PutString(region->x_start, value_y, "       ");
+                SSD1306_PutString(value_x, value_y, region->value);
             }
         }
     }
-
     region->dirty = 0;
 }
 
 // 初始化用户界面
 void OLED_UI_Init(void) {
-    OLED_Init();
-    OLED_Clear();
+    SSD1306_Init();
+    SSD1306_Clear();
 
     init_regions();
     OLED_UI_DrawGrid();
@@ -154,24 +155,23 @@ void OLED_UI_DrawGrid(void) {
         border_x2 = region->x_start + region->width;
         border_y2 = region->y_start + region->height;
         // 绘制空心矩形作为边框
-        OLED_DrawRect(border_x1, border_y1, border_x2, border_y2);
+        SSD1306_DrawRect(border_x1, border_y1, border_x2, border_y2);
     }
-    OLED_Update();
+    SSD1306_Update();
 }
 
 // 更新显示（只更新脏区域）
-void OLED_UI_UpdateDisplay(void) {
+void OLED_UI_UpdateDisplay(uint8_t index) {
     uint8_t i, page_start, page_end, col_start, col_end;
-
-    for (i = 0; i < 9; i++) {
-        if (regions[i].dirty) {
-            draw_region(i);
-            page_start = regions[i].y_start / 8;
-            page_end = (regions[i].y_start + regions[i].height - 1) / 8;
-            col_start = regions[i].x_start;
-            col_end = regions[i].x_start + regions[i].width - 1;
-            OLED_UpdateArea(page_start, page_end, col_start, col_end);
-        }
+    Region_Info *regionInfo = &regions[index];
+    if (regionInfo->dirty) {
+        draw_region(i);
+        page_start = regionInfo->y_start / 8;
+        page_end = (regionInfo->y_start + regionInfo->height - 1) / 8;
+        col_start = regionInfo->x_start;
+        col_end = regionInfo->x_start + regionInfo->width - 1;
+        SSD1306_UpdateArea(page_start, page_end, col_start, col_end);
+        regionInfo->dirty = 0;
     }
 }
 
@@ -246,6 +246,6 @@ void OLED_UI_RefreshAll(void) {
 
     for (i = 0; i < 9; i++) {
         regions[i].dirty = 1;
+        OLED_UI_UpdateDisplay(i);
     }
-    OLED_UI_UpdateDisplay();
 }
